@@ -145,7 +145,16 @@ class RobotContainer:
         aButton = self.driverController.button(XboxController.Button.kA)
         aButton.whileTrue(brakeCommand)  # while "X" button is True (pressed), keep executing the brakeCommand
 
-
+        # DC CA right stick click override - pressing right stick interrupts default joystick driving
+        # Option 1: Lock wheels in X-brake position while right stick is held
+        rightStickCommand = RunCommand(self.robotDrive.setX, self.robotDrive)
+        rightStickButton = self.driverController.button(XboxController.Button.kRightStick)
+        rightStickButton.whileTrue(rightStickCommand)  # when released, default HolonomicDrive resumes
+        # Option 2 (Alternative): Rotate in place when right stick is held
+        # from commands.aimtodirection import AimToDirection
+        # rightStickButton.whileTrue(AimToDirection(degrees=0, drivetrain=self.robotDrive, speed=0.3))
+        # Option 3 (Alternative): Custom command behavior
+        # rightStickButton.whileTrue(commands2.RunCommand(lambda: self.robotDrive.arcadeDrive(xSpeed=0.0, rot=0.5), self.robotDrive))
 
         # DC CA define Xbox buttons:
         #  example of getting a trigger value:
