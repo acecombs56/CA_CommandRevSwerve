@@ -25,6 +25,7 @@ from subsystems.limelight_camera import LimelightCamera
 from subsystems.limelight_localizer import LimelightLocalizer
 
 from commands.reset_xy import ResetXY, ResetSwerveFront
+from commands.reset_robot_position import ResetRobotPosition
 
 # DC CA copied from KitBot
 from constants import OperatorConstants
@@ -263,6 +264,11 @@ class RobotContainer:
         # bButton = self.driverController.button(XboxController.Button.kB)
         # bButton.whileTrue(reversedTrajectoryCommand1)  # while "B" button is pressed, keep running this command
         # DC CA disabled B function for CRS so KitBot eject happens
+
+        # Reset robot position to x=3, y=3, rotation=0 when back button is pressed
+        resetPositionCommand = ResetRobotPosition(self.robotDrive)
+        backButton = self.driverController.button(XboxController.Button.kBack)
+        backButton.onTrue(resetPositionCommand)
 
     def disablePIDSubsystems(self) -> None:
         """Disables all ProfiledPIDSubsystem and PIDSubsystem instances.
