@@ -73,6 +73,12 @@ class RobotContainer:
         # The driver's controller (joystick)
         self.driverController = CommandGenericHID(OIConstants.kDriverControllerPort)
 
+        # DC CA SmartDashboard chooser for slide left/right fieldRelative mode
+        self.slideFieldRelativeChooser = wpilib.SendableChooser()
+        self.slideFieldRelativeChooser.setDefaultOption("False (robot-relative)", False)
+        self.slideFieldRelativeChooser.addOption("True (field-relative)", True)
+        wpilib.SmartDashboard.putData("Slide fieldRelative Mode", self.slideFieldRelativeChooser)
+
         # Configure the button bindings and autos
         self.configureButtonBindings()
         self.configureAutos()
@@ -179,12 +185,16 @@ class RobotContainer:
                                                 self.robotDrive)
         POV_stop = commands2.RunCommand(lambda: self.robotDrive.arcadeDrive(xSpeed=0.0, rot=0.0),
                                                 self.robotDrive)
-        # DC CA next 2 commands - move left/right based on robot heading
-        slideLeft = commands2.RunCommand(lambda: self.robotDrive.drive(xSpeed=0.0, ySpeed=0.3, rotSpeed=0.0, fieldRelative= False, rateLimit=False, square=False ),
-                                            self.robotDrive)
+        # DC CA next 2 commands - move left/right, fieldRelative set via SmartDashboard chooser
+        slideLeft = commands2.RunCommand(
+            lambda: self.robotDrive.drive(xSpeed=0.0, ySpeed=0.3, rotSpeed=0.0,
+                                          fieldRelative=self.slideFieldRelativeChooser.getSelected(),
+                                          rateLimit=False, square=False),
+            self.robotDrive)
         slideRight = commands2.RunCommand(
-            lambda: self.robotDrive.drive(xSpeed=0.0, ySpeed=-0.3, rotSpeed=0.0, fieldRelative=False, rateLimit=False,
-                                          square=False),
+            lambda: self.robotDrive.drive(xSpeed=0.0, ySpeed=-0.3, rotSpeed=0.0,
+                                          fieldRelative=self.slideFieldRelativeChooser.getSelected(),
+                                          rateLimit=False, square=False),
             self.robotDrive)
 
         povUpButton = self.driverController.povUp()
