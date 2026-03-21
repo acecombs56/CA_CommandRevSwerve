@@ -56,10 +56,9 @@ class CANFuelSubsystem(commands2.Subsystem):
         )
 
         # create the configuration for the launcher roller, set a current limit,
-        # set the motor to inverted so that positive values are used for both
-        # intaking and launching, and apply the config to the controller
+        # and apply the config to the controller. Positive voltage = launch forward,
+        # negative voltage = intake backward.
         launcherConfig = rev.SparkMaxConfig()
-        launcherConfig.inverted(True)
         launcherConfig.smartCurrentLimit(FuelConstants.LAUNCHER_MOTOR_CURRENT_LIMIT)
         self.intakeLauncherRoller.configure(
             launcherConfig,
