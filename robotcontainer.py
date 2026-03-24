@@ -39,6 +39,7 @@ from commands.launchstop import LaunchStop
 # from subsystems.candrivesubsystem import CANDriveSubsystem
 from subsystems.canfuelsubsystem import CANFuelSubsystem
 from commands.autoblueleft import AutoBlueLeft
+from commands.drive_forward import DriveForward
 
 
 class RobotContainer:
@@ -122,12 +123,9 @@ class RobotContainer:
         # second, then launch fuel. When the button is released, stop.
         # self.driverController.rightBumper().whileTrue(LaunchSequence(self.fuelSubsystem)
 
-        # DC CA set Y to eject fueld
-        # DC CA disabled the Eject of the fuel via B so limelight camera can do something!
-        # While the A, changed to B button -  is held on the operator controller, eject fuel back out
-        # the intake
+        # DC CA Y button: drive forward ~1 meter quickly
         yButton = self.driverController.button(XboxController.Button.kY)
-        yButton.whileTrue(Eject(self.fuelSubsystem))
+        yButton.whileTrue(DriveForward(distanceMeters=1.0, speed=0.5, drivetrain=self.robotDrive))
 
        # def turn_to_object():
        #     x = self.camera.getX()
