@@ -34,6 +34,10 @@ class MyRobot(commands2.TimedCommandRobot):
         initialization code.
         """
 
+        # Initialize RSL (Robot Signal Light): synchronize DS state so the RSL
+        # flashes when disabled and goes solid when enabled
+        wpilib.DriverStation.refreshData()
+
         # Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         # autonomous chooser on the dashboard.
         #  wpilib.CameraServer().launch(vision_py=vision.main )
