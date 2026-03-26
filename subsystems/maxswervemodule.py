@@ -17,8 +17,12 @@ class MAXSwerveModule:
         drivingCANId: int,
         turningCANId: int,
         chassisAngularOffset: float,
-        turnMotorInverted = True,
+        # turnMotorInverted = True,
         motorControllerType = SparkFlex,
+
+        turnMotorInverted=True,
+        turningMotorControllerType=SparkFlex,
+        drivingMotorControllerType=SparkMax,
         drivingIsTalon = False,
     ) -> None:
         """Constructs a MAXSwerveModule where turning motor is Rev and uses rev absolute encoder.
@@ -28,7 +32,8 @@ class MAXSwerveModule:
         self.desiredState = SwerveModuleState(0.0, Rotation2d())
 
         # turning encoder and PID controller
-        self.turningRevMotor = motorControllerType(
+        # self.turningRevMotor = motorControllerType(
+        self.turningRevMotor = turningMotorControllerType(
             turningCANId, SparkLowLevel.MotorType.kBrushless
         )
         self.turningRevMotor.configure(
@@ -69,7 +74,7 @@ class MAXSwerveModule:
 
         else:
             # REV
-            self.drivingRevMotor = motorControllerType(
+            self.drivingRevMotor = drivingMotorControllerType(
                 drivingCANId, SparkLowLevel.MotorType.kBrushless
             )
             self.drivingRevMotor.configure(

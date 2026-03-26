@@ -6,6 +6,7 @@
 The constants module is a convenience place for teams to hold robot-wide
 numerical or boolean constants. Don't use this for any other purpose!
 """
+# DC CA 3-21-26 this is the 2026 project!
 
 
 import math
@@ -14,6 +15,7 @@ from wpimath import units
 from wpimath.geometry import Translation2d
 from wpimath.kinematics import SwerveDrive4Kinematics
 from wpimath.trajectory import TrapezoidProfileRadians
+from wpimath.geometry import Rotation2d
 
 import rev
 from rev import SparkBase, SparkBaseConfig, ClosedLoopConfig, FeedbackSensor
@@ -26,16 +28,16 @@ class NeoMotorConstants:
 class DriveConstants:
     # Driving Parameters - Note that these are not the maximum capable speeds of
     # the robot, rather the allowed maximum speeds
-    kMaxSpeedMetersPerSecond = 4.8
+    kMaxSpeedMetersPerSecond = 4.8     # DC CA was 4.8
     kMaxAngularSpeed = 2 * math.tau  # radians per second
 
     kMagnitudeSlewRate = 9.8  # m/s per second (1g acceleration allowed along X and along Y axis)
     kRotationalSlewRate = 12.0  # rad/s per second
 
     # Chassis configuration
-    kTrackWidth = units.inchesToMeters(26.5)
+    kTrackWidth = units.inchesToMeters(25.5)   # DC CA was 26.5
     # Distance between centers of right and left wheels on robot
-    kWheelBase = units.inchesToMeters(26.5)
+    kWheelBase = units.inchesToMeters(25.5)
 
     # Distance between front and back wheels on robot
     kModulePositions = [
@@ -47,24 +49,28 @@ class DriveConstants:
     kDriveKinematics = SwerveDrive4Kinematics(*kModulePositions)
 
     # set it to True if you were using a ruler for zeroing and want to ignore the offsets below
-    kAssumeZeroOffsets = True
-
+    kAssumeZeroOffsets = True     # DC was true True
+ # DC CA trying to get wheels adjusted by 90 degrees only when rotating
     # set the above to == False, if you are using Rev zeroing tool (and you have to tinker with offsets below)
-    kFrontLeftChassisAngularOffset = -math.pi / 2
-    kFrontRightChassisAngularOffset = 0
-    kBackLeftChassisAngularOffset = math.pi
-    kBackRightChassisAngularOffset = math.pi / 2
+    #    kFrontLeftChassisAngularOffset = math.pi /2
+
+    kFrontLeftChassisAngularOffset = -math.pi /2    # 2025 testing  -math.pi *  130 / 180
+    kFrontRightChassisAngularOffset =  0              #               -math.pi * 175 / 180
+    kBackLeftChassisAngularOffset = math.pi           #             -math.pi  *  145 / 180
+    kBackRightChassisAngularOffset = math.pi / 2               #            -math.pi *  145 / 180
 
     # SPARK MAX CAN IDs
-    kFrontLeftDrivingCanId = 1
-    kRearLeftDrivingCanId = 2
-    kFrontRightDrivingCanId = 3
-    kRearRightDrivingCanId = 4
+    # DC CA updated can ids for CA 2025 robot    swapped for testing
+    kFrontLeftDrivingCanId = 13  # 11       try 1   13
+    kRearLeftDrivingCanId = 11  # 13             11
+    kFrontRightDrivingCanId = 14  # 12           14
+    kRearRightDrivingCanId = 12  # 14            12
 
-    kFrontLeftTurningCanId = 5
-    kRearLeftTurningCanId = 6
-    kFrontRightTurningCanId = 7
-    kRearRightTurningCanId = 8
+    kFrontLeftTurningCanId = 23  # 21           23
+    kRearLeftTurningCanId = 21  # 23            21
+    kFrontRightTurningCanId = 24  # 22            24
+    kRearRightTurningCanId = 22  # 24             22
+
 
     kGyroReversed = -1  # can be +1 if not flipped (affects field-relative driving)
 
@@ -105,13 +111,14 @@ class ModuleConstants:
     # WATCH OUT:
     #  - one or both of two constants below need to be flipped from True to False (by trial and error)
     #  , depending which swerve module you have (MK4i, MK4n, Rev, WCP, ThriftyBot, etc)
+    # DC CA 2-18-26 for 2025 robot try turning encoder inverted True (was False)
     kTurningEncoderInverted = False
     kTurningMotorInverted = True
 
     # The MAXSwerve module can be configured with one of three pinion gears: 12T, 13T, or 14T.
     # This changes the drive speed of the module (a pinion gear with more teeth will result in a
     # robot that drives faster).
-    kDrivingMotorPinionTeeth = 14
+    kDrivingMotorPinionTeeth = 14    # DC CA was 14
 
     # Calculations required for driving motor conversion factors and feed forward
     kDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60
@@ -136,16 +143,17 @@ class ModuleConstants:
     kTurningEncoderPositionPIDMinInput = 0  # radian
     kTurningEncoderPositionPIDMaxInput = kTurningEncoderPositionFactor  # radian
 
-    kDrivingP = 0.04
+    # DC CA update pid values to 2025 robot values
+    kDrivingP = 0.2
     kDrivingI = 0
-    kDrivingD = 0
+    kDrivingD = 0.02
     kDrivingFF = 1 / kDriveWheelFreeSpeedRps
     kDrivingMinOutput = -1
     kDrivingMaxOutput = 1
 
-    kTurningP = 1  # can be dialed down if you see oscillations in the turning motor
+    kTurningP = .2  # can be dialed down if you see oscillations in the turning motor
     kTurningI = 0
-    kTurningD = 0
+    kTurningD = 0.02
     kTurningFF = 0
     kTurningMinOutput = -1
     kTurningMaxOutput = 1
@@ -162,22 +170,53 @@ class ModuleConstants:
 class OIConstants:
     kDriverControllerPort = 0
     kDriveDeadband = 0.05
-
+    kOperatorControllerPort = 1
+    kOperatorDeadband = 0.05
 
 class AutoConstants:
     kUseSqrtControl = True  # improves arrival time and precision for simple driving commands
 
     # below are really trajectory constants
-    kMaxSpeedMetersPerSecond = 3
+    kMaxSpeedMetersPerSecond = 4.8
     kMaxAccelerationMetersPerSecondSquared = 3
     kMaxAngularSpeedRadiansPerSecond = math.pi
     kMaxAngularSpeedRadiansPerSecondSquared = math.pi
 
     kPXController = 1
     kPYController = 1
-    kPThetaController = 0.67
+    kPThetaController = 1     # DC CA was 0.67
 
     # Constraint for the motion profiled robot angle controller
     kThetaControllerConstraints = TrapezoidProfileRadians.Constraints(
         kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared
     )
+    
+class FuelConstants:
+    # Motor controller IDs for Fuel Mechanism motors
+    FEEDER_MOTOR_ID = 6
+    INTAKE_LAUNCHER_MOTOR_ID = 5
+
+    # Current limit and nominal voltage for fuel mechanism motors.
+    FEEDER_MOTOR_CURRENT_LIMIT = 60
+    LAUNCHER_MOTOR_CURRENT_LIMIT = 60
+
+    # Voltage values for various fuel operations. These values may need to be tuned
+    # based on exact robot construction.
+    # See the Software Guide for tuning information
+    INTAKING_FEEDER_VOLTAGE = -11.0
+    INTAKING_INTAKE_VOLTAGE = -9.0
+    LAUNCHING_FEEDER_VOLTAGE = 9.0
+    LAUNCHING_LAUNCHER_VOLTAGE = -15.0
+    SPIN_UP_FEEDER_VOLTAGE = 6.0
+    SPIN_UP_SECONDS = 2.0
+    
+class OperatorConstants:
+    # Port constants for driver and operator controllers. These should match the
+    # values in the Joystick tab of the Driver Station software
+    DRIVER_CONTROLLER_PORT = 0
+    OPERATOR_CONTROLLER_PORT = 1
+
+    # This value is multiplied by the joystick value when rotating the robot to
+    # help avoid turning too fast and being difficult to control
+    DRIVE_SCALING = 0.7
+    ROTATION_SCALING = 0.4

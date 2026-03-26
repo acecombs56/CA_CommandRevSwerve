@@ -1,0 +1,165 @@
+{
+  "HALProvider": {
+    "Other Devices": {
+      "SPARK Flex [11]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK Flex [11] ABSOLUTE ENCODER": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK Flex [11] ANALOG SENSOR": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK Flex [11] EXTERNAL ENCODER": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK Flex [11] LIMIT SWITCH (FORWARD)": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK Flex [11] RELATIVE ENCODER": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK Flex [21]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK Flex [5]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK Flex [5] RELATIVE ENCODER": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [5]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [6]": {
+        "header": {
+          "open": true
+        }
+      }
+    }
+  },
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Chosen Auto": "String Chooser",
+      "/SmartDashboard/Drive Power Level": "String Chooser",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/LocaLearnRate": "String Chooser",
+      "/SmartDashboard/Localizer": "String Chooser",
+      "/SmartDashboard/POV Power Level": "String Chooser",
+      "/SmartDashboard/Slide fieldRelative Mode": "String Chooser"
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "Robot": {
+          "style": "Box/Image"
+        },
+        "bottom": 1914,
+        "height": 8.069275856018066,
+        "left": 245,
+        "right": 3942,
+        "top": 118,
+        "units": "meters",
+        "width": 16.54119300842285,
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
+    "retained": {
+      "SmartDashboard": {
+        "Chosen Auto": {
+          "open": true
+        },
+        "LocaLearnRate": {
+          "open": true
+        },
+        "open": true
+      }
+    },
+    "transitory": {
+      "FMSInfo": {
+        "open": true
+      },
+      "LiveWindow": {
+        "open": true
+      },
+      "Shuffleboard": {
+        ".metadata": {
+          "open": true
+        },
+        "open": true
+      },
+      "SmartDashboard": {
+        "Chosen Auto": {
+          "open": true
+        },
+        "open": true
+      },
+      "limelight": {
+        "open": true
+      },
+      "limelight-pickup": {
+        "open": true
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "Connections": {
+      "open": true
+    },
+    "Server": {
+      "Subscribers": {
+        "open": true
+      },
+      "open": true
+    },
+    "SmartDashboard-NT3@127.0.0.1:54612": {
+      "Publishers": {
+        "open": true
+      },
+      "Subscribers": {
+        "open": true
+      },
+      "open": true
+    },
+    "SmartDashboard-NT3@127.0.0.1:58421": {
+      "Publishers": {
+        "open": true
+      },
+      "open": true
+    },
+    "SmartDashboard-NT3@127.0.0.1:60386": {
+      "Publishers": {
+        "open": true
+      },
+      "open": true
+    },
+    "visible": true
+  }
+}

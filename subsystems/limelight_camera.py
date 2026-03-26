@@ -20,6 +20,7 @@ class LimelightCamera(Subsystem):
 
         self.pipelineIndexRequest = self.table.getDoubleTopic("pipeline").publish()
         self.pipelineIndex = self.table.getDoubleTopic("getpipe").getEntry(-1)
+
         # "cl" and "tl" are additional latencies in milliseconds
 
         self.ledMode = self.table.getIntegerTopic("ledMode").getEntry(-1)
@@ -91,6 +92,9 @@ class LimelightCamera(Subsystem):
         if heartbeating != self.heartbeating:
             print(f"Camera {self.cameraName} is " + ("UPDATING" if heartbeating else "NO LONGER UPDATING"))
         self.heartbeating = heartbeating
+
+
+
 
 
 def _fix_name(name: str):

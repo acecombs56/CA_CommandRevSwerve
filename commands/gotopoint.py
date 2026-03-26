@@ -48,8 +48,6 @@ class GoToPoint(commands2.Command):
         self.addRequirements(drivetrain)
 
         self.finishDirection = finishDirection
-        if self.speed < 0 and self.finishDirection is not None:
-            self.finishDirection = self.finishDirection.rotateBy(GoToPoint.REVERSE_DIRECTION)
 
     def initialize(self):
         self.initialPosition = self.drivetrain.getPose().translation()
@@ -58,8 +56,11 @@ class GoToPoint(commands2.Command):
         else:
             initialDirection = self.targetPosition - self.initialPosition
             self.desiredEndDirection = Rotation2d(initialDirection.x, initialDirection.y)
+        
+        # Only apply reverse rotation if speed is negative AND we're using a custom finish direction
         if self.speed < 0:
             self.desiredEndDirection = self.desiredEndDirection.rotateBy(GoToPoint.REVERSE_DIRECTION)
+        
         self.initialDistance = self.initialPosition.distance(self.targetPosition)
         self.pointingInGoodDirection = False
         SmartDashboard.putString("command/c" + self.__class__.__name__, "running")
@@ -160,6 +161,8 @@ class GoToPoint(commands2.Command):
         if tooSlowNow:
             SmartDashboard.putString("command/c" + self.__class__.__name__, "slow enough")
             return True
+        
+        return False  # Still working toward the goal
 
     REVERSE_DIRECTION = Rotation2d.fromDegrees(180)
 

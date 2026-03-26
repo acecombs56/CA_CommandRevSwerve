@@ -7,11 +7,18 @@
 
 import typing
 import wpilib
+
+# from wpilib.cameraserver import CameraServer
+
+from cscore import CameraServer
+# import vision
 import commands2
 
 from robotcontainer import RobotContainer
-
-
+from constants import AutoConstants, DriveConstants, OIConstants
+from commands2.button import CommandGenericHID
+from wpilib import XboxController
+# from subsystems.drivesubsystem import DriveSubsystem, BadSimPhysics
 class MyRobot(commands2.TimedCommandRobot):
     """
     Command v2 robots are encouraged to inherit from TimedCommandRobot, which
@@ -29,8 +36,20 @@ class MyRobot(commands2.TimedCommandRobot):
 
         # Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         # autonomous chooser on the dashboard.
+        #  wpilib.CameraServer().launch(vision_py=vision.main )
+        # camera = wpilib.CameraServer.launch(vision_py=vision.main)
+        UsbCamera = CameraServer.startAutomaticCapture()
+        UsbCamera.setFPS(4)
+        UsbCamera.setResolution(320, 240)
+        UsbCamera2 = CameraServer.startAutomaticCapture(1)
+        UsbCamera2.setFPS(4)
+        UsbCamera2.setResolution(320, 240)
+
         self.robotContainer = RobotContainer(self)
 
+
+        self.autonomousCommand = None
+        self.testCommand = None
     def disabledInit(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
 

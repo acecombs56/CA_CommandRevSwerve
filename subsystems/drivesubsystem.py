@@ -1,9 +1,11 @@
 import math
 import typing
 
+import rev
 import wpilib
 
 from commands2 import Subsystem, TimedCommandRobot
+from commands2.cmd import waitSeconds
 from wpimath.filter import SlewRateLimiter
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
 from wpimath.kinematics import (
@@ -26,7 +28,7 @@ GYRO_OVERSHOOT_FRACTION = -3.25 / 360
 
 
 class DriveSubsystem(Subsystem):
-    def __init__(self, maxSpeedScaleFactor=None) -> None:
+    def __init__(self, maxSpeedScaleFactor=None, kBrushed=None) -> None:
         super().__init__()
         if maxSpeedScaleFactor is not None:
             assert callable(maxSpeedScaleFactor)
@@ -46,6 +48,8 @@ class DriveSubsystem(Subsystem):
             DriveConstants.kFrontLeftChassisAngularOffset * enabledChassisAngularOffset,
             turnMotorInverted=ModuleConstants.kTurningMotorInverted,
             motorControllerType=SparkFlex,
+            turningMotorControllerType=SparkMax,
+            drivingMotorControllerType = SparkFlex,
             drivingIsTalon=ModuleConstants.kDrivingMotorIsTalon,
         )
 
@@ -55,6 +59,8 @@ class DriveSubsystem(Subsystem):
             DriveConstants.kFrontRightChassisAngularOffset * enabledChassisAngularOffset,
             turnMotorInverted=ModuleConstants.kTurningMotorInverted,
             motorControllerType=SparkFlex,
+            turningMotorControllerType=SparkMax,
+            drivingMotorControllerType=SparkFlex,
             drivingIsTalon=ModuleConstants.kDrivingMotorIsTalon,
         )
 
@@ -64,6 +70,8 @@ class DriveSubsystem(Subsystem):
             DriveConstants.kBackLeftChassisAngularOffset * enabledChassisAngularOffset,
             turnMotorInverted=ModuleConstants.kTurningMotorInverted,
             motorControllerType=SparkFlex,
+            turningMotorControllerType=SparkMax,
+            drivingMotorControllerType=SparkFlex,
             drivingIsTalon=ModuleConstants.kDrivingMotorIsTalon,
         )
 
@@ -73,11 +81,19 @@ class DriveSubsystem(Subsystem):
             DriveConstants.kBackRightChassisAngularOffset * enabledChassisAngularOffset,
             turnMotorInverted=ModuleConstants.kTurningMotorInverted,
             motorControllerType=SparkFlex,
+            turningMotorControllerType=SparkMax,
+            drivingMotorControllerType=SparkFlex,
             drivingIsTalon=ModuleConstants.kDrivingMotorIsTalon,
         )
 
         # Override for the direction where robot should point
         self.overrideControlsToFaceThisPoint: Translation2d | None = None
+
+        # DC CA define Arm1 motor
+        CA_motor_type = rev.SparkMax.MotorType.kBrushed
+        self.m_Arm1Motor = SparkMax( 9, CA_motor_type )
+
+
 
         # The gyro sensor
         self.gyro = navx.AHRS.create_spi()
@@ -207,9 +223,9 @@ class DriveSubsystem(Subsystem):
         xSpeed: float,
         ySpeed: float,
         rotSpeed: float,
-        fieldRelative: bool,
-        rateLimit: bool,
-        square: bool = False
+        fieldRelative: bool = True,
+        rateLimit: bool = True,
+        square: bool = True
     ) -> None:
         """Method to drive the robot using joystick info.
 
@@ -267,12 +283,28 @@ class DriveSubsystem(Subsystem):
 
     def setX(self) -> None:
         """Sets the wheels into an X formation to prevent movement."""
-        self.frontLeft.setDesiredState(SwerveModuleState(0, Rotation2d.fromDegrees(45)))
+        self.frontLeft.setDesiredState(SwerveModuleState(0, Rotation2d.fromDegrees(-45)))
         self.frontRight.setDesiredState(
             SwerveModuleState(0, Rotation2d.fromDegrees(-45))
         )
         self.rearLeft.setDesiredState(SwerveModuleState(0, Rotation2d.fromDegrees(-45)))
         self.rearRight.setDesiredState(SwerveModuleState(0, Rotation2d.fromDegrees(45)))
+
+    # DC CA run and stop the ARM motor
+    def runarm1(self) -> None:
+        """Run motor """
+        self.m_Arm1Motor.set(.3)
+        print("Y button pressed (held)")
+        self.ypushed = "Y"
+             # waitSeconds(1)
+
+    def stoparm1(self) -> None:
+        self.m_Arm1Motor.set(0)
+        if self.ypushed == "Y":
+            print("Y button released")
+            self.ypushed = "N"
+
+
 
 
     def setModuleStates(
