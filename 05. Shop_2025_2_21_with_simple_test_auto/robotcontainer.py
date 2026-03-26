@@ -77,6 +77,13 @@ class RobotContainer:
         self.configureButtonBindings()
         self.configureAutos()
 
+        # Configure drive power level chooser on SmartDashboard
+        self.powerChooser = wpilib.SendableChooser()
+        self.powerChooser.addOption("25% Power", 0.25)
+        self.powerChooser.setDefaultOption("50% Power", 0.50)
+        self.powerChooser.addOption("75% Power", 0.75)
+        wpilib.SmartDashboard.putData("Drive Power Level", self.powerChooser)
+
         # Configure default command for driving using joystick sticks
         # DC CA 2-20 switched x y on joystick control !!! will probably need to undo once wheels ok
         from commands.holonomicdrive import HolonomicDrive
