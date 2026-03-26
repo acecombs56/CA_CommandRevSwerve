@@ -39,6 +39,7 @@ from commands.launchstop import LaunchStop
 # from subsystems.candrivesubsystem import CANDriveSubsystem
 from subsystems.canfuelsubsystem import CANFuelSubsystem
 from commands.autoblueleft import AutoBlueLeft
+from commands.ca_test_auto import CATestAuto
 from commands.drive_forward import DriveForward
 
 
@@ -291,6 +292,7 @@ class RobotContainer:
         self.chosenAuto.addOption("AutoBlueCenter", self.CA_AutoBlueCenter)
         self.chosenAuto.addOption("GetTestCommand", self.getTestCommand )
         self.chosenAuto.addOption("CA Test Auto", self.CA_TestAuto)
+        self.chosenAuto.addOption("CA Test Auto Simple", self.CA_TestAutoSimple)
         wpilib.SmartDashboard.putData("Chosen Auto", self.chosenAuto)
 
     def getAutonomousLeftBlue(self):
@@ -509,3 +511,7 @@ class RobotContainer:
            .andThen(TA90_stop_AB))
 
         return command
+
+    def CA_TestAutoSimple(self) -> commands2.Command:
+        """Use the CATestAuto command from ca_test_auto.py"""
+        return CATestAuto(self.fuelSubsystem)
