@@ -22,6 +22,7 @@ from subsystems.limelight_camera import LimelightCamera
 from subsystems.limelight_localizer import LimelightLocalizer
 
 from commands.reset_xy import ResetXY, ResetSwerveFront
+from commands.reset_robot_position import ResetRobotPosition
 
 # DC CA copied from KitBot
 from constants import OperatorConstants
@@ -36,6 +37,7 @@ from commands.launchstop import LaunchStop
 from subsystems.canfuelsubsystem import CANFuelSubsystem
 from commands.autoblueleft import AutoBlueLeft
 from commands.ca_test_auto import CATestAuto
+from commands.drive_forward import DriveForward
 
 
 class RobotContainer:
@@ -114,12 +116,9 @@ class RobotContainer:
         # second, then launch fuel. When the button is released, stop.
         # self.driverController.rightBumper().whileTrue(LaunchSequence(self.fuelSubsystem)
 
-        # DC CA set Y to eject fueld
-        # DC CA disabled the Eject of the fuel via B so limelight camera can do something!
-        # While the A, changed to B button -  is held on the operator controller, eject fuel back out
-        # the intake
+        # DC CA Y button: drive forward ~1 meter quickly
         yButton = self.driverController.button(XboxController.Button.kY)
-        yButton.whileTrue(Eject(self.fuelSubsystem))
+        yButton.whileTrue(DriveForward(distanceMeters=1.0, speed=0.5, drivetrain=self.robotDrive))
 
        # def turn_to_object():
        #     x = self.camera.getX()
@@ -146,7 +145,16 @@ class RobotContainer:
         aButton = self.driverController.button(XboxController.Button.kA)
         aButton.whileTrue(brakeCommand)  # while "X" button is True (pressed), keep executing the brakeCommand
 
-
+        # DC CA right stick click override - pressing right stick interrupts default joystick driving
+        # Option 1: Lock wheels in X-brake position while right stick is held
+        rightStickCommand = RunCommand(self.robotDrive.setX, self.robotDrive)
+        rightStickButton = self.driverController.button(XboxController.Button.kRightStick)
+        rightStickButton.whileTrue(rightStickCommand)  # when released, default HolonomicDrive resumes
+        # Option 2 (Alternative): Rotate in place when right stick is held
+        # from commands.aimtodirection import AimToDirection
+        # rightStickButton.whileTrue(AimToDirection(degrees=0, drivetrain=self.robotDrive, speed=0.3))
+        # Option 3 (Alternative): Custom command behavior
+        # rightStickButton.whileTrue(commands2.RunCommand(lambda: self.robotDrive.arcadeDrive(xSpeed=0.0, rot=0.5), self.robotDrive))
 
         # DC CA define Xbox buttons:
         #  example of getting a trigger value:
@@ -255,6 +263,11 @@ class RobotContainer:
         # bButton = self.driverController.button(XboxController.Button.kB)
         # bButton.whileTrue(reversedTrajectoryCommand1)  # while "B" button is pressed, keep running this command
         # DC CA disabled B function for CRS so KitBot eject happens
+
+        # Reset robot position to x=3, y=3, rotation=0 when back button is pressed
+        resetPositionCommand = ResetRobotPosition(self.robotDrive)
+        backButton = self.driverController.button(XboxController.Button.kBack)
+        backButton.onTrue(resetPositionCommand)
 
     def disablePIDSubsystems(self) -> None:
         """Disables all ProfiledPIDSubsystem and PIDSubsystem instances.
