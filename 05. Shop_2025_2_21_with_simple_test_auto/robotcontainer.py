@@ -85,7 +85,9 @@ class RobotContainer:
                 self.robotDrive,
                 forwardSpeed=lambda: +self.driverController.getRawAxis(XboxController.Axis.kLeftX),
                 leftSpeed=lambda: -self.driverController.getRawAxis(XboxController.Axis.kLeftY),
-                rotationSpeed=lambda: -self.driverController.getRawAxis(XboxController.Axis.kRightX),
+                rotationSpeed=lambda: -self.driverController.getRawAxis(XboxController.Axis.kRightX)
+                                     - self.driverController.getRawAxis(XboxController.Axis.kLeftTrigger)   # Left trigger = rotate left
+                                     + self.driverController.getRawAxis(XboxController.Axis.kRightTrigger),  # Right trigger = rotate right
                 deadband=OIConstants.kDriveDeadband,
                 fieldRelative=True,
                 rateLimit=True,
