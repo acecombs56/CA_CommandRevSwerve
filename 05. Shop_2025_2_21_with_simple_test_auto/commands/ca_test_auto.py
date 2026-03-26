@@ -14,10 +14,17 @@ from subsystems.drivesubsystem import DriveSubsystem
 
 class CATestAuto(commands2.SequentialCommandGroup):
     def __init__(self, driveSubsystem: DriveSubsystem, fuelSubsystem: CANFuelSubsystem) -> None:
+    def __init__(self, fuelSubsystem: CANFuelSubsystem, drivetrain: DriveSubsystem) -> None:
         super().__init__()
         self.addCommands(
             PrintCommand("CA_TestAuto started"),
             JerkyTrajectory(drivetrain=driveSubsystem, endpoint=(2.1, 7.4, 270)),
             Launch(fuelSubsystem).withTimeout(2),
+            JerkyTrajectory(
+                drivetrain=drivetrain,
+                speed=+1.0,
+                waypoints=[],
+                endpoint=(2.0, 7.4, 270),
+            ),
             PrintCommand("CA_TestAuto finished")
         )

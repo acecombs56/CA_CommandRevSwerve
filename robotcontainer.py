@@ -25,6 +25,7 @@ from subsystems.limelight_camera import LimelightCamera
 from subsystems.limelight_localizer import LimelightLocalizer
 
 from commands.reset_xy import ResetXY, ResetSwerveFront
+from commands.reset_robot_position import ResetRobotPosition
 
 # DC CA copied from KitBot
 from constants import OperatorConstants
@@ -38,6 +39,7 @@ from commands.launchstop import LaunchStop
 # from subsystems.candrivesubsystem import CANDriveSubsystem
 from subsystems.canfuelsubsystem import CANFuelSubsystem
 from commands.autoblueleft import AutoBlueLeft
+from commands.drive_forward import DriveForward
 
 
 class RobotContainer:
@@ -72,6 +74,12 @@ class RobotContainer:
 
         # The driver's controller (joystick)
         self.driverController = CommandGenericHID(OIConstants.kDriverControllerPort)
+
+        # DC CA SmartDashboard chooser for slide left/right fieldRelative mode
+        self.slideFieldRelativeChooser = wpilib.SendableChooser()
+        self.slideFieldRelativeChooser.setDefaultOption("False (robot-relative)", False)
+        self.slideFieldRelativeChooser.addOption("True (field-relative)", True)
+        wpilib.SmartDashboard.putData("Slide fieldRelative Mode", self.slideFieldRelativeChooser)
 
         # Configure the button bindings and autos
         self.configureButtonBindings()
@@ -115,12 +123,9 @@ class RobotContainer:
         # second, then launch fuel. When the button is released, stop.
         # self.driverController.rightBumper().whileTrue(LaunchSequence(self.fuelSubsystem)
 
-        # DC CA set Y to eject fueld
-        # DC CA disabled the Eject of the fuel via B so limelight camera can do something!
-        # While the A, changed to B button -  is held on the operator controller, eject fuel back out
-        # the intake
+        # DC CA Y button: drive forward ~1 meter quickly
         yButton = self.driverController.button(XboxController.Button.kY)
-        yButton.whileTrue(Eject(self.fuelSubsystem))
+        yButton.whileTrue(DriveForward(distanceMeters=1.0, speed=0.5, drivetrain=self.robotDrive))
 
        # def turn_to_object():
        #     x = self.camera.getX()
@@ -179,12 +184,16 @@ class RobotContainer:
                                                 self.robotDrive)
         POV_stop = commands2.RunCommand(lambda: self.robotDrive.arcadeDrive(xSpeed=0.0, rot=0.0),
                                                 self.robotDrive)
-        # DC CA next 2 commands - move left/right based on robot heading
-        slideLeft = commands2.RunCommand(lambda: self.robotDrive.drive(xSpeed=0.0, ySpeed=0.3, rotSpeed=0.0, fieldRelative= False, rateLimit=False, square=False ),
-                                            self.robotDrive)
+        # DC CA next 2 commands - move left/right, fieldRelative set via SmartDashboard chooser
+        slideLeft = commands2.RunCommand(
+            lambda: self.robotDrive.drive(xSpeed=0.0, ySpeed=0.3, rotSpeed=0.0,
+                                          fieldRelative=self.slideFieldRelativeChooser.getSelected(),
+                                          rateLimit=False, square=False),
+            self.robotDrive)
         slideRight = commands2.RunCommand(
-            lambda: self.robotDrive.drive(xSpeed=0.0, ySpeed=-0.3, rotSpeed=0.0, fieldRelative=False, rateLimit=False,
-                                          square=False),
+            lambda: self.robotDrive.drive(xSpeed=0.0, ySpeed=-0.3, rotSpeed=0.0,
+                                          fieldRelative=self.slideFieldRelativeChooser.getSelected(),
+                                          rateLimit=False, square=False),
             self.robotDrive)
 
         povUpButton = self.driverController.povUp()
@@ -253,6 +262,11 @@ class RobotContainer:
         # bButton = self.driverController.button(XboxController.Button.kB)
         # bButton.whileTrue(reversedTrajectoryCommand1)  # while "B" button is pressed, keep running this command
         # DC CA disabled B function for CRS so KitBot eject happens
+
+        # Reset robot position to x=3, y=3, rotation=0 when back button is pressed
+        resetPositionCommand = ResetRobotPosition(self.robotDrive)
+        backButton = self.driverController.button(XboxController.Button.kBack)
+        backButton.onTrue(resetPositionCommand)
 
     def disablePIDSubsystems(self) -> None:
         """Disables all ProfiledPIDSubsystem and PIDSubsystem instances.
