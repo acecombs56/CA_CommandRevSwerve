@@ -22,6 +22,7 @@ from subsystems.limelight_camera import LimelightCamera
 from subsystems.limelight_localizer import LimelightLocalizer
 
 from commands.reset_xy import ResetXY, ResetSwerveFront
+from commands.reset_robot_position import ResetRobotPosition
 
 # DC CA copied from KitBot
 from constants import OperatorConstants
@@ -35,6 +36,8 @@ from commands.launchstop import LaunchStop
 # from subsystems.candrivesubsystem import CANDriveSubsystem
 from subsystems.canfuelsubsystem import CANFuelSubsystem
 from commands.autoblueleft import AutoBlueLeft
+from commands.ca_test_auto import CATestAuto
+from commands.drive_forward import DriveForward
 
 
 class RobotContainer:
@@ -87,9 +90,11 @@ class RobotContainer:
         self.robotDrive.setDefaultCommand(
             HolonomicDrive(
                 self.robotDrive,
-                forwardSpeed=lambda: +self.driverController.getRawAxis(XboxController.Axis.kLeftX) * (self.powerChooser.getSelected() or 0.50),
-                leftSpeed=lambda: -self.driverController.getRawAxis(XboxController.Axis.kLeftY) * (self.powerChooser.getSelected() or 0.50),
-                rotationSpeed=lambda: -self.driverController.getRawAxis(XboxController.Axis.kRightX) * (self.powerChooser.getSelected() or 0.50),
+                forwardSpeed=lambda: +self.driverController.getRawAxis(XboxController.Axis.kLeftX),
+                leftSpeed=lambda: -self.driverController.getRawAxis(XboxController.Axis.kLeftY),
+                rotationSpeed=lambda: -self.driverController.getRawAxis(XboxController.Axis.kRightX)
+                                     - self.driverController.getRawAxis(XboxController.Axis.kLeftTrigger)   # Left trigger = rotate left
+                                     + self.driverController.getRawAxis(XboxController.Axis.kRightTrigger),  # Right trigger = rotate right
                 deadband=OIConstants.kDriveDeadband,
                 fieldRelative=True,
                 rateLimit=True,
@@ -120,12 +125,9 @@ class RobotContainer:
         # second, then launch fuel. When the button is released, stop.
         # self.driverController.rightBumper().whileTrue(LaunchSequence(self.fuelSubsystem)
 
-        # DC CA set Y to eject fueld
-        # DC CA disabled the Eject of the fuel via B so limelight camera can do something!
-        # While the A, changed to B button -  is held on the operator controller, eject fuel back out
-        # the intake
+        # DC CA Y button: drive forward ~1 meter quickly
         yButton = self.driverController.button(XboxController.Button.kY)
-        yButton.whileTrue(Eject(self.fuelSubsystem))
+        yButton.whileTrue(DriveForward(distanceMeters=1.0, speed=0.5, drivetrain=self.robotDrive))
 
        # def turn_to_object():
        #     x = self.camera.getX()
@@ -271,6 +273,11 @@ class RobotContainer:
         # bButton.whileTrue(reversedTrajectoryCommand1)  # while "B" button is pressed, keep running this command
         # DC CA disabled B function for CRS so KitBot eject happens
 
+        # Reset robot position to x=3, y=3, rotation=0 when back button is pressed
+        resetPositionCommand = ResetRobotPosition(self.robotDrive)
+        backButton = self.driverController.button(XboxController.Button.kBack)
+        backButton.onTrue(resetPositionCommand)
+
     def disablePIDSubsystems(self) -> None:
         """Disables all ProfiledPIDSubsystem and PIDSubsystem instances.
         This should be called on robot disable to prevent integral windup."""
@@ -294,6 +301,7 @@ class RobotContainer:
         self.chosenAuto.addOption("AutoBlueCenter", self.CA_AutoBlueCenter)
         self.chosenAuto.addOption("GetTestCommand", self.getTestCommand )
         self.chosenAuto.addOption("CA Test Auto", self.CA_TestAuto)
+        self.chosenAuto.addOption("CA Test Auto Simple", self.CA_TestAutoSimple)
         wpilib.SmartDashboard.putData("Chosen Auto", self.chosenAuto)
 
     def getAutonomousLeftBlue(self):
@@ -498,4 +506,8 @@ class RobotContainer:
                    .andThen(stop_ABLt))
 
         return command
+
+    def CA_TestAutoSimple(self) -> commands2.Command:
+        """Use the CATestAuto command from ca_test_auto.py"""
+        return CATestAuto(self.fuelSubsystem)
 
